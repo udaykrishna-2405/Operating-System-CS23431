@@ -1,0 +1,82 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import random
+
+class VirtualMemorySimulator:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Virtual Memory Simulator")
+        self.root.geometry("900x600")
+        
+        self.create_widgets()
+    
+    def create_widgets(self):
+        # Title Label
+        ttk.Label(self.root, text="Virtual Memory Simulator", font=("Arial", 16)).pack(pady=10)
+        
+        # Memory Frame
+        self.memory_frame = ttk.LabelFrame(self.root, text="Memory Simulation")
+        self.memory_frame.pack(pady=10, fill="both", expand=True)
+        
+        # Page Table View
+        self.table = ttk.Treeview(self.memory_frame, columns=("Page", "Frame"), show="headings")
+        self.table.heading("Page", text="Page Number")
+        self.table.heading("Frame", text="Frame Number")
+        self.table.pack(pady=10, fill="both", expand=True)
+        
+        # Buttons
+        self.btn_frame = ttk.Frame(self.root)
+        self.btn_frame.pack(pady=10)
+        
+        ttk.Button(self.btn_frame, text="Simulate Paging", command=self.simulate_paging).pack(side=tk.LEFT, padx=5)
+        ttk.Button(self.btn_frame, text="Simulate Replacement", command=self.simulate_page_replacement).pack(side=tk.LEFT, padx=5)
+        ttk.Button(self.btn_frame, text="Simulate Segmentation", command=self.simulate_segmentation).pack(side=tk.LEFT, padx=5)
+        ttk.Button(self.btn_frame, text="Simulate Demand Paging", command=self.simulate_demand_paging).pack(side=tk.LEFT, padx=5)
+        ttk.Button(self.btn_frame, text="Simulate Memory Allocation", command=self.simulate_memory_allocation).pack(side=tk.LEFT, padx=5)
+        ttk.Button(self.btn_frame, text="Clear", command=self.clear_table).pack(side=tk.LEFT, padx=5)
+    
+    def simulate_paging(self):
+        self.clear_table()
+        pages = list(range(1, 6))  # Sample 5 pages
+        frames = random.sample(range(1, 11), len(pages))  # Random 5 frames
+        for page, frame in zip(pages, frames):
+            self.table.insert("", tk.END, values=(page, frame))
+    
+    def simulate_page_replacement(self):
+        self.clear_table()
+        policies = ["FIFO", "LRU", "Optimal"]
+        policy = random.choice(policies)
+        messagebox.showinfo("Page Replacement", f"Simulating {policy} algorithm")
+    
+    def simulate_segmentation(self):
+        self.clear_table()
+        segments = ["Code", "Data", "Stack"]
+        bases = random.sample(range(1000, 5000, 500), len(segments))
+        limits = [random.randint(100, 500) for _ in segments]
+        for seg, base, limit in zip(segments, bases, limits):
+            self.table.insert("", tk.END, values=(seg, f"Base: {base}, Limit: {limit}"))
+    
+    def simulate_demand_paging(self):
+        self.clear_table()
+        pages = list(range(1, 6))
+        frames = [None] * len(pages)  # Initially no pages in frames
+        loaded_pages = random.sample(pages, random.randint(2, len(pages)))  # Random pages loaded
+        for page in loaded_pages:
+            frames[pages.index(page)] = random.randint(1, 10)
+        for page, frame in zip(pages, frames):
+            self.table.insert("", tk.END, values=(page, frame if frame else "Not Loaded"))
+    
+    def simulate_memory_allocation(self):
+        self.clear_table()
+        strategies = ["First-Fit", "Best-Fit", "Worst-Fit"]
+        strategy = random.choice(strategies)
+        messagebox.showinfo("Memory Allocation", f"Using {strategy} strategy")
+    
+    def clear_table(self):
+        for row in self.table.get_children():
+            self.table.delete(row)
+    
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = VirtualMemorySimulator(root)
+    root.mainloop()
